@@ -1,0 +1,9 @@
+spring.application.name=AgendaPersonal
+
+spring.datasource.url=jdbc:postgresql://localhost:5432/agenda_personal
+spring.datasource.username=postgres
+spring.datasource.password=TU_CONTRASENA
+
+spring.jpa.hibernate.ddl-auto=update
+spring.jpa.show-sql=true
+spring.jpa.properties.hibernate.format_sql=true

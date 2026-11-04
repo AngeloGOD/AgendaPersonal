@@ -1,7 +1,8 @@
-
 package com.agenda.personal.entidad;
 
 import java.time.LocalDate;
+
+import com.agenda.personal.enums.FrecuenciaRecurrencia;
 
 import jakarta.persistence.*;
 
@@ -20,8 +21,9 @@ public class ReglaRecurrencia {
     @JoinColumn(name = "evento_id", nullable = false, unique = true)
     private Evento evento;
 
+    @Enumerated(EnumType.STRING)
     @Column(nullable = false, length = 20)
-    private String frecuencia;
+    private FrecuenciaRecurrencia frecuencia;
 
     @Column(nullable = false)
     private Integer intervalo = 1;
@@ -39,11 +41,9 @@ public class ReglaRecurrencia {
     @Column(name = "numero_ocurrencias")
     private Integer numeroOcurrencias;
 
-    // Constructor vacío
     public ReglaRecurrencia() {
     }
 
-    // Getters y setters
     public Long getId() {
         return id;
     }
@@ -60,11 +60,11 @@ public class ReglaRecurrencia {
         this.evento = evento;
     }
 
-    public String getFrecuencia() {
+    public FrecuenciaRecurrencia getFrecuencia() {
         return frecuencia;
     }
 
-    public void setFrecuencia(String frecuencia) {
+    public void setFrecuencia(FrecuenciaRecurrencia frecuencia) {
         this.frecuencia = frecuencia;
     }
 

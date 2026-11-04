@@ -1,5 +1,6 @@
-
 package com.agenda.personal.entidad;
+
+import com.agenda.personal.enums.EstadoInvitacion;
 
 import jakarta.persistence.*;
 
@@ -20,11 +21,13 @@ public class ParticipanteEvento {
     @Column(name = "usuario_id", nullable = false)
     private Long usuarioId;
 
-    // Constructor vacío
+    @Enumerated(EnumType.STRING)
+    @Column(name = "estado_invitacion", nullable = false, length = 20)
+    private EstadoInvitacion estadoInvitacion = EstadoInvitacion.PENDIENTE;
+
     public ParticipanteEvento() {
     }
 
-    // Getters y setters
     public Long getId() {
         return id;
     }
@@ -55,5 +58,13 @@ public class ParticipanteEvento {
 
     public void setUsuarioId(Long usuarioId) {
         this.usuarioId = usuarioId;
+    }
+
+    public EstadoInvitacion getEstadoInvitacion() {
+        return estadoInvitacion;
+    }
+
+    public void setEstadoInvitacion(EstadoInvitacion estadoInvitacion) {
+        this.estadoInvitacion = estadoInvitacion;
     }
 }

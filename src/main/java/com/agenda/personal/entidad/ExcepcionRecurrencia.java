@@ -1,7 +1,8 @@
-
 package com.agenda.personal.entidad;
 
 import java.time.Instant;
+
+import com.agenda.personal.enums.TipoExcepcion;
 
 import jakarta.persistence.*;
 
@@ -20,8 +21,9 @@ public class ExcepcionRecurrencia {
     @Column(name = "fecha_original", nullable = false)
     private Instant fechaOriginal;
 
+    @Enumerated(EnumType.STRING)
     @Column(nullable = false, length = 20)
-    private String tipo;
+    private TipoExcepcion tipo;
 
     @Column(name = "nueva_fecha_inicio")
     private Instant nuevaFechaInicio;
@@ -32,11 +34,9 @@ public class ExcepcionRecurrencia {
     @Column(name = "nueva_ubicacion", length = 255)
     private String nuevaUbicacion;
 
-    // Constructor vacío
     public ExcepcionRecurrencia() {
     }
 
-    // Getters y setters
     public Long getId() {
         return id;
     }
@@ -61,11 +61,11 @@ public class ExcepcionRecurrencia {
         this.fechaOriginal = fechaOriginal;
     }
 
-    public String getTipo() {
+    public TipoExcepcion getTipo() {
         return tipo;
     }
 
-    public void setTipo(String tipo) {
+    public void setTipo(TipoExcepcion tipo) {
         this.tipo = tipo;
     }
 

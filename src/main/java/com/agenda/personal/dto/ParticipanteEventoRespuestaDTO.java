@@ -1,4 +1,3 @@
-
 package com.agenda.personal.dto;
 
 public class ParticipanteEventoRespuestaDTO {
@@ -7,6 +6,7 @@ public class ParticipanteEventoRespuestaDTO {
     private Long eventoId;
     private Long contactoId;
     private Long usuarioId;
+    private String estadoInvitacion;
 
     public ParticipanteEventoRespuestaDTO() {
     }
@@ -15,12 +15,14 @@ public class ParticipanteEventoRespuestaDTO {
             Long id,
             Long eventoId,
             Long contactoId,
-            Long usuarioId) {
+            Long usuarioId,
+            String estadoInvitacion) {
 
         this.id = id;
         this.eventoId = eventoId;
         this.contactoId = contactoId;
         this.usuarioId = usuarioId;
+        this.estadoInvitacion = estadoInvitacion;
     }
 
     public Long getId() {
@@ -53,5 +55,13 @@ public class ParticipanteEventoRespuestaDTO {
 
     public void setUsuarioId(Long usuarioId) {
         this.usuarioId = usuarioId;
+    }
+
+    public String getEstadoInvitacion() {
+        return estadoInvitacion;
+    }
+
+    public void setEstadoInvitacion(String estadoInvitacion) {
+        this.estadoInvitacion = estadoInvitacion;
     }
 }

@@ -1,7 +1,8 @@
-
 package com.agenda.personal.dto;
 
-import jakarta.validation.constraints.NotBlank;
+import com.agenda.personal.enums.TipoDireccion;
+
+import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 
 public class DireccionContactoDTO {
@@ -30,9 +31,8 @@ public class DireccionContactoDTO {
     @Size(max = 100, message = "El país no puede superar los 100 caracteres")
     private String pais;
 
-    @NotBlank(message = "El tipo de dirección es obligatorio")
-    @Size(max = 20, message = "El tipo no puede superar los 20 caracteres")
-    private String tipo = "CASA";
+    @NotNull(message = "El tipo de dirección es obligatorio")
+    private TipoDireccion tipo = TipoDireccion.CASA;
 
     private boolean esPrincipal = false;
 
@@ -103,11 +103,11 @@ public class DireccionContactoDTO {
         this.pais = pais;
     }
 
-    public String getTipo() {
+    public TipoDireccion getTipo() {
         return tipo;
     }
 
-    public void setTipo(String tipo) {
+    public void setTipo(TipoDireccion tipo) {
         this.tipo = tipo;
     }
 

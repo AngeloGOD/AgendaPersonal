@@ -1,7 +1,9 @@
-
 package com.agenda.personal.dto;
 
+import com.agenda.personal.enums.TipoTelefono;
+
 import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 
 public class TelefonoContactoDTO {
@@ -13,9 +15,8 @@ public class TelefonoContactoDTO {
     @Size(max = 5, message = "El código de país no puede superar los 5 caracteres")
     private String codigoPais;
 
-    @NotBlank(message = "El tipo de teléfono es obligatorio")
-    @Size(max = 20, message = "El tipo no puede superar los 20 caracteres")
-    private String tipo = "MOVIL";
+    @NotNull(message = "El tipo de teléfono es obligatorio")
+    private TipoTelefono tipo = TipoTelefono.MOVIL;
 
     private boolean esPrincipal = false;
 
@@ -38,11 +39,11 @@ public class TelefonoContactoDTO {
         this.codigoPais = codigoPais;
     }
 
-    public String getTipo() {
+    public TipoTelefono getTipo() {
         return tipo;
     }
 
-    public void setTipo(String tipo) {
+    public void setTipo(TipoTelefono tipo) {
         this.tipo = tipo;
     }
 

@@ -312,7 +312,7 @@ CREATE TABLE recordatorio (
     id BIGINT GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
     evento_id BIGINT NOT NULL,
     minutos_antes INTEGER NOT NULL DEFAULT 15,
-    canal VARCHAR(20) NOT NULL DEFAULT 'APP',
+    tipo VARCHAR(20) NOT NULL DEFAULT 'NOTIFICACION',
     activo BOOLEAN NOT NULL DEFAULT TRUE,
 
     CONSTRAINT fk_recordatorio_evento
@@ -322,11 +322,8 @@ CREATE TABLE recordatorio (
     CONSTRAINT chk_recordatorio_minutos
         CHECK (minutos_antes >= 0),
 
-    CONSTRAINT chk_recordatorio_canal
-        CHECK (canal IN ('APP', 'EMAIL')),
-
     CONSTRAINT uq_recordatorio
-        UNIQUE (evento_id, minutos_antes, canal)
+        UNIQUE (evento_id, minutos_antes, tipo)
 );
 
 
@@ -337,11 +334,11 @@ CREATE TABLE recordatorio (
 CREATE TABLE regla_recurrencia (
     id BIGINT GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
     evento_id BIGINT NOT NULL UNIQUE,
-    frecuencia VARCHAR(15) NOT NULL,
+    frecuencia VARCHAR(20) NOT NULL,
     intervalo INTEGER NOT NULL DEFAULT 1,
     dias_semana SMALLINT[],
-    dia_mes SMALLINT,
-    fecha_fin TIMESTAMPTZ,
+    dia_mes INTEGER,
+    fecha_fin DATE,
     numero_ocurrencias INTEGER,
 
     CONSTRAINT fk_recurrencia_evento
@@ -386,20 +383,18 @@ CREATE TABLE regla_recurrencia (
 CREATE TABLE excepcion_recurrencia (
     id BIGINT GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
     evento_id BIGINT NOT NULL,
-    fecha_inicio_original TIMESTAMPTZ NOT NULL,
-    tipo VARCHAR(15) NOT NULL,
-    titulo_nuevo VARCHAR(180),
-    descripcion_nueva TEXT,
-    fecha_inicio_nueva TIMESTAMPTZ,
-    fecha_fin_nueva TIMESTAMPTZ,
-    ubicacion_nueva VARCHAR(255),
+    fecha_original TIMESTAMPTZ NOT NULL,
+    tipo VARCHAR(20) NOT NULL,
+    nueva_fecha_inicio TIMESTAMPTZ,
+    nueva_fecha_fin TIMESTAMPTZ,
+    nueva_ubicacion VARCHAR(255),
 
     CONSTRAINT fk_excepcion_evento
         FOREIGN KEY (evento_id) REFERENCES evento(id)
         ON DELETE CASCADE,
 
     CONSTRAINT uq_excepcion_ocurrencia
-        UNIQUE (evento_id, fecha_inicio_original),
+        UNIQUE (evento_id, fecha_original),
 
     CONSTRAINT chk_excepcion_tipo
         CHECK (tipo IN ('OMITIR', 'MODIFICAR')),
@@ -408,30 +403,22 @@ CREATE TABLE excepcion_recurrencia (
         CHECK (
             (
                 tipo = 'OMITIR'
-                AND titulo_nuevo IS NULL
-                AND descripcion_nueva IS NULL
-                AND fecha_inicio_nueva IS NULL
-                AND fecha_fin_nueva IS NULL
-                AND ubicacion_nueva IS NULL
+                AND nueva_fecha_inicio IS NULL
+                AND nueva_fecha_fin IS NULL
+                AND nueva_ubicacion IS NULL
             )
             OR
             (
                 tipo = 'MODIFICAR'
-                AND (
-                    titulo_nuevo IS NOT NULL
-                    OR descripcion_nueva IS NOT NULL
-                    OR fecha_inicio_nueva IS NOT NULL
-                    OR fecha_fin_nueva IS NOT NULL
-                    OR ubicacion_nueva IS NOT NULL
-                )
+                AND nueva_fecha_inicio IS NOT NULL
             )
         ),
 
     CONSTRAINT chk_excepcion_fechas
         CHECK (
-            fecha_fin_nueva IS NULL
-            OR fecha_inicio_nueva IS NULL
-            OR fecha_fin_nueva >= fecha_inicio_nueva
+            nueva_fecha_fin IS NULL
+            OR nueva_fecha_inicio IS NULL
+            OR nueva_fecha_fin >= nueva_fecha_inicio
         )
 );
 

@@ -3,8 +3,13 @@ package com.agenda.personal.entidad;
 
 import java.time.Instant;
 
+import com.agenda.personal.enums.EstadoEvento;
+import com.agenda.personal.enums.TipoEvento;
+
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
 import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
@@ -42,11 +47,13 @@ public class Evento {
     @Column(name = "ubicacion", length = 255)
     private String ubicacion;
 
+    @Enumerated(EnumType.STRING)
     @Column(name = "tipo", nullable = false, length = 30)
-    private String tipo = "OTRO";
+    private TipoEvento tipo = TipoEvento.OTRO;
 
+    @Enumerated(EnumType.STRING)
     @Column(name = "estado", nullable = false, length = 20)
-    private String estado = "PROGRAMADO";
+    private EstadoEvento estado = EstadoEvento.PROGRAMADO;
 
     @Column(name = "todo_el_dia", nullable = false)
     private boolean todoElDia = false;
@@ -134,19 +141,19 @@ public class Evento {
         this.ubicacion = ubicacion;
     }
 
-    public String getTipo() {
+    public TipoEvento getTipo() {
         return tipo;
     }
 
-    public void setTipo(String tipo) {
+    public void setTipo(TipoEvento tipo) {
         this.tipo = tipo;
     }
 
-    public String getEstado() {
+    public EstadoEvento getEstado() {
         return estado;
     }
 
-    public void setEstado(String estado) {
+    public void setEstado(EstadoEvento estado) {
         this.estado = estado;
     }
 

@@ -3,6 +3,9 @@ package com.agenda.personal.dto;
 
 import java.time.Instant;
 
+import com.agenda.personal.enums.EstadoEvento;
+import com.agenda.personal.enums.TipoEvento;
+
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
@@ -24,13 +27,11 @@ public class EventoDTO {
     @Size(max = 255, message = "La ubicación no puede superar los 255 caracteres")
     private String ubicacion;
 
-    @NotBlank(message = "El tipo de evento es obligatorio")
-    @Size(max = 30, message = "El tipo no puede superar los 30 caracteres")
-    private String tipo = "OTRO";
+    @NotNull(message = "El tipo de evento es obligatorio")
+    private TipoEvento tipo = TipoEvento.OTRO;
 
-    @NotBlank(message = "El estado del evento es obligatorio")
-    @Size(max = 20, message = "El estado no puede superar los 20 caracteres")
-    private String estado = "PROGRAMADO";
+    @NotNull(message = "El estado del evento es obligatorio")
+    private EstadoEvento estado = EstadoEvento.PROGRAMADO;
 
     private boolean todoElDia = false;
 
@@ -77,19 +78,19 @@ public class EventoDTO {
         this.ubicacion = ubicacion;
     }
 
-    public String getTipo() {
+    public TipoEvento getTipo() {
         return tipo;
     }
 
-    public void setTipo(String tipo) {
+    public void setTipo(TipoEvento tipo) {
         this.tipo = tipo;
     }
 
-    public String getEstado() {
+    public EstadoEvento getEstado() {
         return estado;
     }
 
-    public void setEstado(String estado) {
+    public void setEstado(EstadoEvento estado) {
         this.estado = estado;
     }
 

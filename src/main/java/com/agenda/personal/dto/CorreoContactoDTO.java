@@ -1,8 +1,10 @@
-
 package com.agenda.personal.dto;
+
+import com.agenda.personal.enums.TipoCorreo;
 
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 
 public class CorreoContactoDTO {
@@ -12,9 +14,8 @@ public class CorreoContactoDTO {
     @Size(max = 254, message = "El correo no puede superar los 254 caracteres")
     private String correo;
 
-    @NotBlank(message = "El tipo de correo es obligatorio")
-    @Size(max = 20, message = "El tipo no puede superar los 20 caracteres")
-    private String tipo = "PERSONAL";
+    @NotNull(message = "El tipo de correo es obligatorio")
+    private TipoCorreo tipo = TipoCorreo.PERSONAL;
 
     private boolean esPrincipal = false;
 
@@ -29,11 +30,11 @@ public class CorreoContactoDTO {
         this.correo = correo;
     }
 
-    public String getTipo() {
+    public TipoCorreo getTipo() {
         return tipo;
     }
 
-    public void setTipo(String tipo) {
+    public void setTipo(TipoCorreo tipo) {
         this.tipo = tipo;
     }
 

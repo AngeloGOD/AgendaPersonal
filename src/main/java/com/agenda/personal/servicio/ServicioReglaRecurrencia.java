@@ -1,8 +1,5 @@
-
 package com.agenda.personal.servicio;
 
-import java.util.Arrays;
-import java.util.Locale;
 import java.util.Optional;
 
 import org.springframework.stereotype.Service;
@@ -10,6 +7,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import com.agenda.personal.entidad.Evento;
 import com.agenda.personal.entidad.ReglaRecurrencia;
+import com.agenda.personal.enums.FrecuenciaRecurrencia;
 import com.agenda.personal.repositorio.EventoRepository;
 import com.agenda.personal.repositorio.ReglaRecurrenciaRepository;
 
@@ -91,26 +89,12 @@ public class ServicioReglaRecurrencia {
 
     private void validarRegla(ReglaRecurrencia regla) {
 
-        if (regla.getFrecuencia() == null
-                || regla.getFrecuencia().isBlank()) {
+        FrecuenciaRecurrencia frecuencia = regla.getFrecuencia();
 
+        if (frecuencia == null) {
             throw new IllegalArgumentException(
                     "La frecuencia de recurrencia es obligatoria.");
         }
-
-        String frecuencia = regla.getFrecuencia()
-                .trim()
-                .toUpperCase(Locale.ROOT);
-
-        if (!Arrays.asList(
-                "DIARIA", "SEMANAL", "MENSUAL", "ANUAL")
-                .contains(frecuencia)) {
-
-            throw new IllegalArgumentException(
-                    "La frecuencia debe ser DIARIA, SEMANAL, MENSUAL o ANUAL.");
-        }
-
-        regla.setFrecuencia(frecuencia);
 
         if (regla.getIntervalo() == null
                 || regla.getIntervalo() <= 0) {
@@ -152,7 +136,7 @@ public class ServicioReglaRecurrencia {
                     "El día del mes debe estar entre 1 y 31.");
         }
 
-        if ("SEMANAL".equals(frecuencia)
+        if (frecuencia == FrecuenciaRecurrencia.SEMANAL
                 && (regla.getDiasSemana() == null
                 || regla.getDiasSemana().length == 0)) {
 
@@ -161,7 +145,7 @@ public class ServicioReglaRecurrencia {
                     + "para una recurrencia semanal.");
         }
 
-        if ("MENSUAL".equals(frecuencia)
+        if (frecuencia == FrecuenciaRecurrencia.MENSUAL
                 && regla.getDiaMes() == null) {
 
             throw new IllegalArgumentException(

@@ -1,9 +1,9 @@
-
 package com.agenda.personal.dto;
 
 import java.time.Instant;
 
-import jakarta.validation.constraints.NotBlank;
+import com.agenda.personal.enums.TipoExcepcion;
+
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 
@@ -12,9 +12,8 @@ public class ExcepcionRecurrenciaDTO {
     @NotNull(message = "La fecha original es obligatoria")
     private Instant fechaOriginal;
 
-    @NotBlank(message = "El tipo de excepción es obligatorio")
-    @Size(max = 20, message = "El tipo no puede superar los 20 caracteres")
-    private String tipo;
+    @NotNull(message = "El tipo de excepción es obligatorio")
+    private TipoExcepcion tipo;
 
     private Instant nuevaFechaInicio;
 
@@ -34,11 +33,11 @@ public class ExcepcionRecurrenciaDTO {
         this.fechaOriginal = fechaOriginal;
     }
 
-    public String getTipo() {
+    public TipoExcepcion getTipo() {
         return tipo;
     }
 
-    public void setTipo(String tipo) {
+    public void setTipo(TipoExcepcion tipo) {
         this.tipo = tipo;
     }
 

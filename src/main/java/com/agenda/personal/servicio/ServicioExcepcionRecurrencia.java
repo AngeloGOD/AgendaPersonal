@@ -1,9 +1,7 @@
-
 package com.agenda.personal.servicio;
 
 import java.time.Instant;
 import java.util.List;
-import java.util.Locale;
 import java.util.Objects;
 import java.util.Optional;
 
@@ -12,6 +10,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import com.agenda.personal.entidad.Evento;
 import com.agenda.personal.entidad.ExcepcionRecurrencia;
+import com.agenda.personal.enums.TipoExcepcion;
 import com.agenda.personal.repositorio.EventoRepository;
 import com.agenda.personal.repositorio.ExcepcionRecurrenciaRepository;
 
@@ -128,25 +127,14 @@ public class ServicioExcepcionRecurrencia {
                     "La fecha original de la ocurrencia es obligatoria.");
         }
 
-        if (excepcion.getTipo() == null
-                || excepcion.getTipo().isBlank()) {
+        TipoExcepcion tipo = excepcion.getTipo();
 
+        if (tipo == null) {
             throw new IllegalArgumentException(
                     "El tipo de excepción es obligatorio.");
         }
 
-        String tipo = excepcion.getTipo()
-                .trim()
-                .toUpperCase(Locale.ROOT);
-
-        if (!tipo.equals("OMITIR") && !tipo.equals("MODIFICAR")) {
-            throw new IllegalArgumentException(
-                    "El tipo de excepción debe ser OMITIR o MODIFICAR.");
-        }
-
-        excepcion.setTipo(tipo);
-
-        if ("MODIFICAR".equals(tipo)) {
+        if (tipo == TipoExcepcion.MODIFICAR) {
 
             if (excepcion.getNuevaFechaInicio() == null) {
                 throw new IllegalArgumentException(
@@ -166,7 +154,7 @@ public class ServicioExcepcionRecurrencia {
             }
         }
 
-        if ("OMITIR".equals(tipo)) {
+        if (tipo == TipoExcepcion.OMITIR) {
 
             if (excepcion.getNuevaFechaInicio() != null
                     || excepcion.getNuevaFechaFin() != null

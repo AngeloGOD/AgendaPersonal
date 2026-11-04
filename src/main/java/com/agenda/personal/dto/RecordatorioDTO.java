@@ -1,10 +1,9 @@
-
 package com.agenda.personal.dto;
 
-import jakarta.validation.constraints.NotBlank;
+import com.agenda.personal.enums.TipoRecordatorio;
+
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.PositiveOrZero;
-import jakarta.validation.constraints.Size;
 
 public class RecordatorioDTO {
 
@@ -12,9 +11,8 @@ public class RecordatorioDTO {
     @PositiveOrZero(message = "Los minutos de anticipación no pueden ser negativos")
     private Integer minutosAntes;
 
-    @NotBlank(message = "El tipo de recordatorio es obligatorio")
-    @Size(max = 20, message = "El tipo no puede superar los 20 caracteres")
-    private String tipo = "NOTIFICACION";
+    @NotNull(message = "El tipo de recordatorio es obligatorio")
+    private TipoRecordatorio tipo = TipoRecordatorio.NOTIFICACION;
 
     private boolean activo = true;
 
@@ -29,11 +27,11 @@ public class RecordatorioDTO {
         this.minutosAntes = minutosAntes;
     }
 
-    public String getTipo() {
+    public TipoRecordatorio getTipo() {
         return tipo;
     }
 
-    public void setTipo(String tipo) {
+    public void setTipo(TipoRecordatorio tipo) {
         this.tipo = tipo;
     }
 

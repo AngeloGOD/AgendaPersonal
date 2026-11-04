@@ -1,4 +1,3 @@
-
 package com.agenda.personal.servicio;
 
 import java.util.List;
@@ -9,6 +8,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import com.agenda.personal.entidad.Evento;
 import com.agenda.personal.entidad.Recordatorio;
+import com.agenda.personal.enums.TipoRecordatorio;
 import com.agenda.personal.repositorio.EventoRepository;
 import com.agenda.personal.repositorio.RecordatorioRepository;
 
@@ -103,14 +103,15 @@ public class ServicioRecordatorio {
                     "Los minutos antes del evento deben ser cero o mayores.");
         }
 
-        if (recordatorio.getTipo() == null
-                || recordatorio.getTipo().isBlank()) {
-
+        if (recordatorio.getTipo() == null) {
             throw new IllegalArgumentException(
                     "El tipo de recordatorio es obligatorio.");
         }
 
-        recordatorio.setTipo(recordatorio.getTipo().trim().toUpperCase());
+        if (recordatorio.getTipo() != TipoRecordatorio.NOTIFICACION) {
+            throw new IllegalArgumentException(
+                    "El tipo de recordatorio no es válido.");
+        }
     }
 
     private Evento verificarEvento(Long eventoId, Long usuarioId) {

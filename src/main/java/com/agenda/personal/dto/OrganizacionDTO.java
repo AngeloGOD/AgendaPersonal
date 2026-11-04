@@ -1,7 +1,9 @@
-
 package com.agenda.personal.dto;
 
+import com.agenda.personal.enums.TipoOrganizacion;
+
 import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 
 public class OrganizacionDTO {
@@ -10,9 +12,8 @@ public class OrganizacionDTO {
     @Size(max = 180, message = "El nombre no puede superar los 180 caracteres")
     private String nombre;
 
-    @NotBlank(message = "El tipo de organización es obligatorio")
-    @Size(max = 30, message = "El tipo no puede superar los 30 caracteres")
-    private String tipo = "EMPRESA";
+    @NotNull(message = "El tipo de organización es obligatorio")
+    private TipoOrganizacion tipo = TipoOrganizacion.EMPRESA;
 
     @Size(max = 255, message = "El sitio web no puede superar los 255 caracteres")
     private String sitioWeb;
@@ -33,11 +34,11 @@ public class OrganizacionDTO {
         this.nombre = nombre;
     }
 
-    public String getTipo() {
+    public TipoOrganizacion getTipo() {
         return tipo;
     }
 
-    public void setTipo(String tipo) {
+    public void setTipo(TipoOrganizacion tipo) {
         this.tipo = tipo;
     }
 

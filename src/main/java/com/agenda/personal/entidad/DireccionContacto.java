@@ -1,7 +1,18 @@
-
 package com.agenda.personal.entidad;
 
-import jakarta.persistence.*;
+import com.agenda.personal.enums.TipoDireccion;
+
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
+import jakarta.persistence.FetchType;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
+import jakarta.persistence.Table;
 
 @Entity
 @Table(name = "direccion_contacto")
@@ -11,11 +22,11 @@ public class DireccionContacto {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @ManyToOne(fetch = FetchType.LAZY, optional = false)
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "contacto_id", nullable = false)
     private Contacto contacto;
 
-    @Column(length = 150)
+    @Column(name = "calle", length = 150)
     private String calle;
 
     @Column(name = "numero_exterior", length = 20)
@@ -24,32 +35,30 @@ public class DireccionContacto {
     @Column(name = "numero_interior", length = 20)
     private String numeroInterior;
 
-    @Column(length = 100)
+    @Column(name = "colonia", length = 100)
     private String colonia;
 
-    @Column(length = 100)
+    @Column(name = "ciudad", length = 100)
     private String ciudad;
 
-    @Column(length = 100)
+    @Column(name = "estado", length = 100)
     private String estado;
 
-    @Column(name = "codigo_postal", length = 15)
+    @Column(name = "codigo_postal", length = 10)
     private String codigoPostal;
 
-    @Column(length = 100)
+    @Column(name = "pais", length = 100)
     private String pais;
 
-    @Column(nullable = false, length = 20)
-    private String tipo = "CASA";
+    @Enumerated(EnumType.STRING)
+    @Column(name = "tipo", nullable = false, length = 20)
+    private TipoDireccion tipo = TipoDireccion.CASA;
 
     @Column(name = "es_principal", nullable = false)
-    private boolean esPrincipal = false;
-
-    // Constructor vacío
-    public DireccionContacto() {
-    }
+    private Boolean esPrincipal = false;
 
     // Getters y setters
+
     public Long getId() {
         return id;
     }
@@ -130,19 +139,19 @@ public class DireccionContacto {
         this.pais = pais;
     }
 
-    public String getTipo() {
+    public TipoDireccion getTipo() {
         return tipo;
     }
 
-    public void setTipo(String tipo) {
+    public void setTipo(TipoDireccion tipo) {
         this.tipo = tipo;
     }
 
-    public boolean isEsPrincipal() {
+    public Boolean isEsPrincipal() {
         return esPrincipal;
     }
 
-    public void setEsPrincipal(boolean esPrincipal) {
+    public void setEsPrincipal(Boolean esPrincipal) {
         this.esPrincipal = esPrincipal;
     }
 }

@@ -1,8 +1,11 @@
-
 package com.agenda.personal.entidad;
+
+import com.agenda.personal.enums.TipoTelefono;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
 import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
@@ -29,16 +32,15 @@ public class TelefonoContacto {
     @Column(name = "codigo_pais", length = 5)
     private String codigoPais;
 
+    @Enumerated(EnumType.STRING)
     @Column(name = "tipo", nullable = false, length = 20)
-    private String tipo = "MOVIL";
+    private TipoTelefono tipo = TipoTelefono.MOVIL;
 
     @Column(name = "es_principal", nullable = false)
     private boolean esPrincipal = false;
 
     public TelefonoContacto() {
     }
-
-    // Getters y setters
 
     public Long getId() {
         return id;
@@ -72,11 +74,11 @@ public class TelefonoContacto {
         this.codigoPais = codigoPais;
     }
 
-    public String getTipo() {
+    public TipoTelefono getTipo() {
         return tipo;
     }
 
-    public void setTipo(String tipo) {
+    public void setTipo(TipoTelefono tipo) {
         this.tipo = tipo;
     }
 

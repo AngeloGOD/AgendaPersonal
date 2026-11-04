@@ -1,5 +1,6 @@
-
 package com.agenda.personal.entidad;
+
+import com.agenda.personal.enums.TipoRecordatorio;
 
 import jakarta.persistence.*;
 
@@ -18,17 +19,16 @@ public class Recordatorio {
     @Column(name = "minutos_antes", nullable = false)
     private Integer minutosAntes;
 
+    @Enumerated(EnumType.STRING)
     @Column(nullable = false, length = 20)
-    private String tipo = "NOTIFICACION";
+    private TipoRecordatorio tipo = TipoRecordatorio.NOTIFICACION;
 
     @Column(nullable = false)
     private boolean activo = true;
 
-    // Constructor vacío
     public Recordatorio() {
     }
 
-    // Getters y setters
     public Long getId() {
         return id;
     }
@@ -53,11 +53,11 @@ public class Recordatorio {
         this.minutosAntes = minutosAntes;
     }
 
-    public String getTipo() {
+    public TipoRecordatorio getTipo() {
         return tipo;
     }
 
-    public void setTipo(String tipo) {
+    public void setTipo(TipoRecordatorio tipo) {
         this.tipo = tipo;
     }
 

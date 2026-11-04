@@ -1,4 +1,3 @@
-
 package com.agenda.personal.servicio;
 
 import java.util.List;
@@ -8,6 +7,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.agenda.personal.entidad.ParticipanteEvento;
+import com.agenda.personal.enums.EstadoInvitacion;
 import com.agenda.personal.repositorio.ContactoRepository;
 import com.agenda.personal.repositorio.EventoRepository;
 import com.agenda.personal.repositorio.ParticipanteEventoRepository;
@@ -63,6 +63,7 @@ public class ServicioParticipanteEvento {
         participante.setEventoId(eventoId);
         participante.setContactoId(contactoId);
         participante.setUsuarioId(usuarioId);
+        participante.setEstadoInvitacion(EstadoInvitacion.PENDIENTE);
 
         return participanteRepository.save(participante);
     }

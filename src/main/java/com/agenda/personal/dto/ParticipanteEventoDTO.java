@@ -1,4 +1,3 @@
-
 package com.agenda.personal.dto;
 
 import jakarta.validation.constraints.NotNull;

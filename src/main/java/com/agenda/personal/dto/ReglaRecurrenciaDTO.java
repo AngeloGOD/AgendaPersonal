@@ -1,20 +1,18 @@
-
 package com.agenda.personal.dto;
 
 import java.time.LocalDate;
 
+import com.agenda.personal.enums.FrecuenciaRecurrencia;
+
 import jakarta.validation.constraints.Max;
 import jakarta.validation.constraints.Min;
-import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Positive;
-import jakarta.validation.constraints.Size;
 
 public class ReglaRecurrenciaDTO {
 
-    @NotBlank(message = "La frecuencia es obligatoria")
-    @Size(max = 20, message = "La frecuencia no puede superar los 20 caracteres")
-    private String frecuencia;
+    @NotNull(message = "La frecuencia es obligatoria")
+    private FrecuenciaRecurrencia frecuencia;
 
     @NotNull(message = "El intervalo es obligatorio")
     @Positive(message = "El intervalo debe ser mayor que cero")
@@ -34,11 +32,11 @@ public class ReglaRecurrenciaDTO {
     public ReglaRecurrenciaDTO() {
     }
 
-    public String getFrecuencia() {
+    public FrecuenciaRecurrencia getFrecuencia() {
         return frecuencia;
     }
 
-    public void setFrecuencia(String frecuencia) {
+    public void setFrecuencia(FrecuenciaRecurrencia frecuencia) {
         this.frecuencia = frecuencia;
     }
 

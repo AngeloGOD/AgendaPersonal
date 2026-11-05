@@ -18,49 +18,43 @@ import org.springframework.security.web.context.SecurityContextRepository;
 @EnableWebSecurity
 public class SecurityConfig {
 
-    @Bean
-    public PasswordEncoder passwordEncoder() {
-        return new BCryptPasswordEncoder();
-    }
+	@Bean
+	public PasswordEncoder passwordEncoder() {
+		return new BCryptPasswordEncoder();
+	}
 
-    @Bean
-    public AuthenticationManager authenticationManager(
-            AuthenticationConfiguration configuration) throws Exception {
+	@Bean
+	public AuthenticationManager authenticationManager(AuthenticationConfiguration configuration) throws Exception {
 
-        return configuration.getAuthenticationManager();
-    }
-    
-    @Bean
-    public SecurityContextRepository securityContextRepository() {
-        return new HttpSessionSecurityContextRepository();
-    }
+		return configuration.getAuthenticationManager();
+	}
 
-    @Bean
-    public SecurityFilterChain securityFilterChain(
-            HttpSecurity http) throws Exception {
+	@Bean
+	public SecurityContextRepository securityContextRepository() {
+		return new HttpSessionSecurityContextRepository();
+	}
 
-        http
-            .csrf(csrf -> csrf.disable())
+	@Bean
+	public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
 
-            .authorizeHttpRequests(auth -> auth
-                .requestMatchers(
-                    "/api/autenticacion/login",
-                    "/api/usuarios/registro"
-                ).permitAll()
+		http.csrf(csrf -> csrf.disable())
 
-                .anyRequest().authenticated()
-            )
+				.authorizeHttpRequests(auth -> auth
+						// Archivos públicos del frontend
+						.requestMatchers("/", "/index.html", "/css/**", "/js/**", "/favicon.ico").permitAll()
 
-            .sessionManagement(session -> session
-                .sessionCreationPolicy(
-                    SessionCreationPolicy.IF_REQUIRED
-                )
-            )
+						// Endpoints públicos
+						.requestMatchers("/api/autenticacion/login", "/api/usuarios/registro").permitAll()
 
-            .formLogin(form -> form.disable())
+						// Todo lo demás requiere autenticación
+						.anyRequest().authenticated())
 
-            .httpBasic(basic -> basic.disable());
+				.sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.IF_REQUIRED))
 
-        return http.build();
-    }
+				.formLogin(form -> form.disable())
+
+				.httpBasic(basic -> basic.disable());
+
+		return http.build();
+	}
 }

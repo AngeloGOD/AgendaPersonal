@@ -37,7 +37,9 @@ const API = {
                 (typeof datos === "string" ? datos : null) ||
                 `Error en la solicitud (${respuesta.status})`;
 
-            throw new Error(mensaje);
+            const error = new Error(mensaje);
+            error.status = respuesta.status;
+            throw error;
         }
 
         return datos;

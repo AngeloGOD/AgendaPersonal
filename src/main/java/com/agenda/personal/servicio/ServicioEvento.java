@@ -33,6 +33,11 @@ public class ServicioEvento {
             Instant fechaInicio,
             Instant fechaFin) {
 
+        if (usuarioId == null) {
+            throw new IllegalArgumentException(
+                    "El usuario es obligatorio.");
+        }
+
         if (fechaInicio == null || fechaFin == null) {
             throw new IllegalArgumentException(
                     "Las fechas del intervalo son obligatorias.");
@@ -43,19 +48,26 @@ public class ServicioEvento {
                     "La fecha final no puede ser anterior a la inicial.");
         }
 
-        return eventoRepository
-                .findAllByUsuario_IdAndFechaInicioBetweenOrderByFechaInicioAsc(
-                        usuarioId, fechaInicio, fechaFin);
+        return eventoRepository.buscarEventosEnIntervalo(
+                usuarioId,
+                fechaInicio,
+                fechaFin
+        );
     }
 
     @Transactional(readOnly = true)
-    public Optional<Evento> buscarPorId(Long id, Long usuarioId) {
+    public Optional<Evento> buscarPorId(
+            Long id,
+            Long usuarioId) {
 
         if (id == null || usuarioId == null) {
             return Optional.empty();
         }
 
-        return eventoRepository.findByIdAndUsuario_Id(id, usuarioId);
+        return eventoRepository.findByIdAndUsuario_Id(
+                id,
+                usuarioId
+        );
     }
 
     public Evento guardar(Evento evento, Long usuarioId) {
@@ -63,6 +75,11 @@ public class ServicioEvento {
         if (evento == null) {
             throw new IllegalArgumentException(
                     "Los datos del evento son obligatorios.");
+        }
+
+        if (usuarioId == null) {
+            throw new IllegalArgumentException(
+                    "El usuario es obligatorio.");
         }
 
         if (evento.getTitulo() == null
@@ -81,14 +98,23 @@ public class ServicioEvento {
 
         if (evento.getFechaFin().isBefore(evento.getFechaInicio())) {
             throw new IllegalArgumentException(
-                    "La fecha final no puede ser anterior a la fecha inicial.");
+                    "La fecha final no puede ser anterior a la inicial.");
+        }
+
+        if (evento.getTipo() == null) {
+            throw new IllegalArgumentException(
+                    "El tipo de evento es obligatorio.");
+        }
+
+        if (evento.getEstado() == null) {
+            throw new IllegalArgumentException(
+                    "El estado del evento es obligatorio.");
         }
 
         Usuario usuario = usuarioRepository.findById(usuarioId)
                 .orElseThrow(() -> new IllegalArgumentException(
                         "El usuario indicado no existe."));
 
-        // Crear un evento nuevo.
         if (evento.getId() == null) {
 
             evento.setUsuario(usuario);
@@ -97,12 +123,12 @@ public class ServicioEvento {
             return eventoRepository.save(evento);
         }
 
-        // Buscar el evento comprobando su propietario.
-        Evento existente = buscarPorId(evento.getId(), usuarioId)
-                .orElseThrow(() -> new IllegalArgumentException(
-                        "El evento no existe o no pertenece al usuario."));
+        Evento existente = buscarPorId(
+                evento.getId(),
+                usuarioId
+        ).orElseThrow(() -> new IllegalArgumentException(
+                "El evento no existe o no pertenece al usuario."));
 
-        // Actualizar únicamente los datos del evento.
         existente.setTitulo(evento.getTitulo().trim());
         existente.setDescripcion(evento.getDescripcion());
         existente.setFechaInicio(evento.getFechaInicio());

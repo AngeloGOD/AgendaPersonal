@@ -110,6 +110,53 @@ const Calendario = (() => {
 
             eventos = Array.isArray(respuesta) ? respuesta : [];
 
+            // Cargar los participantes de cada evento para mostrarlos
+            // también en la vista del calendario, sin abrir la edición.
+            if (eventos.length > 0) {
+                try {
+                    const contactosRespuesta = await API.get("/api/contactos");
+                    const contactos = Array.isArray(contactosRespuesta)
+                        ? contactosRespuesta
+                        : [];
+
+                    const contactosPorId = new Map(
+                        contactos.map(contacto => [Number(contacto.id), contacto])
+                    );
+
+                    await Promise.all(eventos.map(async evento => {
+                        try {
+                            const respuestaParticipantes = await API.get(
+                                `/api/eventos/${Number(evento.id)}/participantes`
+                            );
+
+                            const participantes = Array.isArray(respuestaParticipantes)
+                                ? respuestaParticipantes
+                                : [];
+
+                            evento.participantesNombres = participantes.map(participante => {
+                                const contacto = contactosPorId.get(Number(participante.contactoId));
+
+                                if (!contacto) return null;
+
+                                const nombre = `${contacto.nombre || ""} ${contacto.apellidos || ""}`.trim();
+                                return nombre || contacto.apodo || "Contacto sin nombre";
+                            }).filter(Boolean);
+
+                        } catch (errorParticipantes) {
+                            console.warn(
+                                `No se pudieron cargar los participantes del evento ${evento.id}:`,
+                                errorParticipantes
+                            );
+                            evento.participantesNombres = [];
+                        }
+                    }));
+
+                } catch (errorContactos) {
+                    console.warn("No se pudieron cargar los nombres de los contactos:", errorContactos);
+                    eventos.forEach(evento => evento.participantesNombres = []);
+                }
+            }
+
         } catch (error) {
 
             console.error("No se pudieron cargar los eventos:", error);
@@ -161,13 +208,26 @@ const Calendario = (() => {
 
         return eventos.filter(evento => {
 
-            if (!evento.fechaInicio) return false;
+            if (!evento.fechaInicio || !evento.fechaFin) {
+                return false;
+            }
 
-            const fechaEvento = claveFecha(
+            const fechaInicio = claveFecha(
                 new Date(evento.fechaInicio)
             );
 
-            return fechaEvento === clave;
+            const fechaFin = claveFecha(
+                new Date(evento.fechaFin)
+            );
+
+            // El evento aparece desde su día de inicio
+            // hasta su día de finalización, ambos incluidos.
+            return fechaInicio <= clave && fechaFin >= clave;
+
+        }).sort((a, b) => {
+
+            return new Date(a.fechaInicio) - new Date(b.fechaInicio);
+
         });
     }
 
@@ -196,35 +256,108 @@ const Calendario = (() => {
         });
     }
 
-    function htmlEvento(evento) {
+    function informacionTiempoDia(evento, fecha) {
+
+        if (evento.todoElDia) {
+            return "Todo el día";
+        }
+
+        const fechaInicio = claveFecha(new Date(evento.fechaInicio));
+        const fechaFin = claveFecha(new Date(evento.fechaFin));
+        const fechaConsultada = claveFecha(fecha);
+
+        const horaFin = new Date(evento.fechaFin).toLocaleTimeString("es-MX", {
+            hour: "2-digit",
+            minute: "2-digit",
+            hour12: true
+        });
+
+        if (fechaInicio === fechaFin) {
+            return `${horaEvento(evento)} - ${horaFin}`;
+        }
+
+        if (fechaConsultada === fechaInicio) {
+            return `Inicia ${horaEvento(evento)}`;
+        }
+
+        if (fechaConsultada === fechaFin) {
+            return `Finaliza ${horaFin}`;
+        }
+
+        return "Todo el día";
+    }
+
+    function htmlEvento(evento, fecha) {
+
+        const fechaInicio = claveFecha(new Date(evento.fechaInicio));
+        const fechaFin = claveFecha(new Date(evento.fechaFin));
+        const fechaActual = claveFecha(fecha);
+
+        let informacionTiempo = "";
+
+        if (evento.todoElDia) {
+
+            informacionTiempo = "Todo el día";
+
+        } else if (fechaActual === fechaInicio && fechaActual === fechaFin) {
+
+            // Evento que comienza y termina el mismo día.
+            informacionTiempo = `${horaEvento(evento)} - ${new Date(evento.fechaFin).toLocaleTimeString("es-MX", {
+                hour: "2-digit",
+                minute: "2-digit",
+                hour12: true
+            })
+                }`;
+
+        } else if (fechaActual === fechaInicio) {
+
+            // Primer día.
+            informacionTiempo = `Inicia ${horaEvento(evento)}`;
+
+        } else if (fechaActual === fechaFin) {
+
+            // Último día.
+            informacionTiempo = `Finaliza ${new Date(evento.fechaFin).toLocaleTimeString("es-MX", {
+                hour: "2-digit",
+                minute: "2-digit",
+                hour12: true
+            })}`;
+
+        } else {
+
+            // Días intermedios.
+            informacionTiempo = "Continúa";
+
+        }
 
         return `
-            <div class="cal-evento ${claseEvento(evento.tipo)}"
-                 data-evento-id="${Number(evento.id)}"
-                 role="button"
-                 tabindex="0"
-                 title="Editar: ${escaparHTML(evento.titulo)}">
+	        <div class="cal-evento ${claseEvento(evento.tipo)}"
+	             data-evento-id="${Number(evento.id)}"
+	             role="button"
+	             tabindex="0"
+	             title="Editar: ${escaparHTML(evento.titulo)}">
 
-                ${evento.todoElDia ? "" : `<span>${horaEvento(evento)}</span>`}
+	            <span>${informacionTiempo}</span>
 
-                <strong>${escaparHTML(evento.titulo)}</strong>
+	            <strong>${escaparHTML(evento.titulo)}</strong>
 
-            </div>
-        `;
+	        </div>
+	    `;
     }
+
 
     function seleccionarFecha(fechaTexto) {
 
         const [anio, mes, dia] = fechaTexto.split("-").map(Number);
 
+        // Actualizamos la fecha seleccionada sin cambiar la vista actual.
         fechaActual = new Date(anio, mes - 1, dia);
 
-        vistaActual = "dia";
-
-        actualizar();
-
+        // Abrimos el formulario con la fecha seleccionada.
         EventosUI.abrir(fechaTexto);
+
     }
+
 
     function configurarInteracciones() {
 
@@ -305,7 +438,7 @@ const Calendario = (() => {
             <div class="cal-cuadricula">
         `;
 
-        for (let i = 0; i < 42; i++) {
+        for (let i = 0;i < 42;i++) {
 
             const fecha = sumarDias(inicio, i);
             const clave = claveFecha(fecha);
@@ -328,19 +461,19 @@ const Calendario = (() => {
 
                     <div class="cal-numero-dia">
                         ${esHoy
-                            ? `<span class="cal-circulo-hoy">${fecha.getDate()}</span>`
-                            : fecha.getDate()
-                        }
+                    ? `<span class="cal-circulo-hoy">${fecha.getDate()}</span>`
+                    : fecha.getDate()
+                }
                     </div>
 
                     <div class="cal-eventos-dia">
 
-                        ${listaEventos.slice(0, 3).map(htmlEvento).join("")}
+                        ${listaEventos.slice(0, 3).map(evento => htmlEvento(evento, fecha)).join("")}
 
                         ${listaEventos.length > 3
-                            ? `<span class="cal-mas-eventos">+${listaEventos.length - 3} más</span>`
-                            : ""
-                        }
+                    ? `<span class="cal-mas-eventos">+${listaEventos.length - 3} más</span>`
+                    : ""
+                }
 
                     </div>
 
@@ -360,7 +493,7 @@ const Calendario = (() => {
 
         let html = `<div class="cal-vista-semana">`;
 
-        for (let i = 0; i < 7; i++) {
+        for (let i = 0;i < 7;i++) {
 
             const fecha = sumarDias(inicio, i);
             const clave = claveFecha(fecha);
@@ -380,7 +513,7 @@ const Calendario = (() => {
                     </div>
 
                     <div class="cal-lista-eventos">
-                        ${eventosDelDia(fecha).map(htmlEvento).join("")}
+                        ${eventosDelDia(fecha).map(evento => htmlEvento(evento, fecha)).join("")}
                     </div>
 
                 </div>
@@ -416,9 +549,9 @@ const Calendario = (() => {
                          tabindex="0"
                          title="Editar evento">
 
-                        <div class="cal-hora-dia">
-                            ${horaEvento(evento)}
-                        </div>
+						 <div class="cal-hora-dia">
+						     ${informacionTiempoDia(evento, fechaActual)}
+						 </div>
 
                         <div class="cal-detalle-dia ${claseEvento(evento.tipo)}">
 
@@ -426,10 +559,23 @@ const Calendario = (() => {
 
                             <span>${escaparHTML(evento.tipo || "OTRO")}</span>
 
+                            ${evento.descripcion
+                ? `<small class="cal-descripcion-dia">${escaparHTML(evento.descripcion)}</small>`
+                : ""
+            }
+
                             ${evento.ubicacion
-                                ? `<small>${escaparHTML(evento.ubicacion)}</small>`
-                                : ""
-                            }
+                ? `<small>${escaparHTML(evento.ubicacion)}</small>`
+                : ""
+            }
+
+                            ${Array.isArray(evento.participantesNombres) && evento.participantesNombres.length > 0
+                ? `<div class="cal-participantes-dia">
+                                       <span class="cal-participantes-etiqueta">Participantes:</span>
+                                       <span>${evento.participantesNombres.map(nombre => escaparHTML(nombre)).join(", ")}</span>
+                                   </div>`
+                : ""
+            }
 
                         </div>
 

@@ -15,6 +15,10 @@ public interface ExcepcionRecurrenciaRepository
             Long eventoId
     );
 
+    List<ExcepcionRecurrencia> findAllByEvento_IdInOrderByFechaOriginalAsc(
+            List<Long> eventoIds
+    );
+
     Optional<ExcepcionRecurrencia> findByIdAndEvento_Id(
             Long id,
             Long eventoId
@@ -24,5 +28,4 @@ public interface ExcepcionRecurrenciaRepository
             Long eventoId,
             Instant fechaOriginal
     );
-
 }

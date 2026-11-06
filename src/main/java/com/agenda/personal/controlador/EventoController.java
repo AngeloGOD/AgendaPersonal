@@ -1,4 +1,3 @@
-
 package com.agenda.personal.controlador;
 
 import java.time.Instant;
@@ -20,10 +19,12 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.agenda.personal.dto.EventoCalendarioDTO;
 import com.agenda.personal.dto.EventoDTO;
 import com.agenda.personal.dto.EventoRespuestaDTO;
 import com.agenda.personal.entidad.Evento;
 import com.agenda.personal.seguridad.UsuarioAutenticadoService;
+import com.agenda.personal.servicio.ServicioCalendario;
 import com.agenda.personal.servicio.ServicioEvento;
 
 @RestController
@@ -31,19 +32,22 @@ import com.agenda.personal.servicio.ServicioEvento;
 public class EventoController {
 
     private final ServicioEvento servicioEvento;
+    private final ServicioCalendario servicioCalendario;
     private final UsuarioAutenticadoService usuarioAutenticadoService;
 
     public EventoController(
             ServicioEvento servicioEvento,
+            ServicioCalendario servicioCalendario,
             UsuarioAutenticadoService usuarioAutenticadoService) {
 
         this.servicioEvento = servicioEvento;
+        this.servicioCalendario = servicioCalendario;
         this.usuarioAutenticadoService = usuarioAutenticadoService;
     }
 
-    // Obtener eventos dentro de un intervalo de fechas.
+    // Obtener eventos y ocurrencias recurrentes del calendario.
     @GetMapping
-    public ResponseEntity<List<EventoRespuestaDTO>> obtenerEventos(
+    public ResponseEntity<List<EventoCalendarioDTO>> obtenerEventos(
             @RequestParam
             @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME)
             Instant fechaInicio,
@@ -57,17 +61,17 @@ public class EventoController {
         Long usuarioId = usuarioAutenticadoService
                 .obtenerUsuarioId(autenticacion);
 
-        List<EventoRespuestaDTO> eventos =
-                servicioEvento.obtenerEventos(
-                        usuarioId, fechaInicio, fechaFin)
-                        .stream()
-                        .map(this::convertirARespuesta)
-                        .toList();
+        List<EventoCalendarioDTO> eventos =
+                servicioCalendario.obtenerEventos(
+                        usuarioId,
+                        fechaInicio,
+                        fechaFin
+                );
 
         return ResponseEntity.ok(eventos);
     }
 
-    // Obtener un evento por su ID.
+    // Obtener un evento original por su ID.
     @GetMapping("/{id}")
     public ResponseEntity<EventoRespuestaDTO> obtenerEvento(
             @PathVariable Long id,
@@ -136,7 +140,6 @@ public class EventoController {
         return ResponseEntity.noContent().build();
     }
 
-    // Convertir DTO a entidad.
     private Evento convertirAEntidad(EventoDTO datos) {
 
         Evento evento = new Evento();
@@ -153,7 +156,6 @@ public class EventoController {
         return evento;
     }
 
-    // Convertir entidad a DTO de respuesta.
     private EventoRespuestaDTO convertirARespuesta(Evento evento) {
 
         return new EventoRespuestaDTO(
